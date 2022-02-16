@@ -134,7 +134,7 @@ blogsRouter.post("/:blogId/comment", async (req, res, next) => {
           createHttpError(404, `blog with Id ${req.params.blogId} not found!`)
         );
       }
-    } 
+    }
   } catch (error) {
     next(error);
   }
