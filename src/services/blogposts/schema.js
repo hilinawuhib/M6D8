@@ -7,16 +7,16 @@ const blogSchema = new Schema(
     cover: { type: String, required: true },
     readTime: {
       value: { type: Number, required: true },
-      unit: { type:String, required: true },
+      unit: { type: String, required: true },
     },
     author: {
-      name: { type: String, required: true },
-      avatar: { type: String, required: false },
+      first_name: { type: String, required: true },
+      last_name: { type: String, required: true },
     },
+
     comment: [
       {
-        first_name: { type: String },
-        last_name: { type: String },
+        name: { type: String },
         comment: { type: String },
       },
     ],

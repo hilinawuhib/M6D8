@@ -69,11 +69,13 @@ blogsRouter.delete("/:blogId", async (req, res, next) => {
   }
 });
 
+//blogs with comments
+
 blogsRouter.get("/:blogId/comment", async (req, res, next) => {
   try {
     const blog = await BlogsModel.findById(req.params);
     if (blog) {
-      res.send(user.comment);
+      res.send(blog.comment);
     } else {
       next(error);
     }
@@ -83,13 +85,13 @@ blogsRouter.get("/:blogId/comment", async (req, res, next) => {
 });
 blogsRouter.get("/:blogId/comment/:commentId", async (req, res, next) => {
   try {
-    const blog = await Blogs.findById(req.params.id);
+    const blog = await BlogsModel.findById(req.params.id);
     if (!blog) {
       res
         .status(404)
         .send({ message: `blog with ${req.params.id} is not found!` });
     } else {
-      const commentIndex = blog.comments.findIndex(
+      const commentIndex = blog.comment.findIndex(
         (comment) => comment._id.toString() === req.params.commentId
       );
       if (commentIndex === -1) {
@@ -98,7 +100,7 @@ blogsRouter.get("/:blogId/comment/:commentId", async (req, res, next) => {
         });
       } else {
         blog.comments[commentIndex] = {
-          ...blog.comments[commentIndex]._doc,
+          ...blog.comment[commentIndex]._doc,
           ...req.body,
         };
         await blog.save();
@@ -148,7 +150,7 @@ blogsRouter.put("/:blogid/comment/:commentId", async (req, res, next) => {
         .status(404)
         .send({ message: `blog with ${req.params.id} is not found!` });
     } else {
-      const commentIndex = blog.comments.findIndex(
+      const commentIndex = blog.comment.findIndex(
         (comment) => comment._id.toString() === req.params.commentId
       );
       if (commentIndex === -1) {
@@ -156,8 +158,8 @@ blogsRouter.put("/:blogid/comment/:commentId", async (req, res, next) => {
           message: `comment with ${req.params.commentId} is not found!`,
         });
       } else {
-        blog.comments[commentIndex] = {
-          ...blog.comments[commentIndex]._doc,
+        blog.comment[commentIndex] = {
+          ...blog.comment[commentIndex]._doc,
           ...req.body,
         };
         await blog.save();
@@ -177,11 +179,11 @@ blogsRouter.delete("/:blogId/comment/:commentId", async (req, res, next) => {
         .status(404)
         .send({ message: `blog with ${req.params.id} is not found!` });
     } else {
-      await Blogs.findByIdAndUpdate(
+      await BlogsModel.findByIdAndUpdate(
         req.params.id,
         {
           $pull: {
-            comments: { _id: req.params.commentId },
+            comment: { _id: req.params.commentId },
           },
         },
         { new: true }
