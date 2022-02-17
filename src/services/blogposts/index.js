@@ -1,7 +1,7 @@
 import express from "express";
 import createHttpError from "http-errors";
 import BlogsModel from "./schema.js";
-import CommentModel from "../comments/schema.js";
+import CommentsModel from "../comments/schema.js";
 
 const blogsRouter = express.Router();
 
@@ -114,9 +114,7 @@ blogsRouter.get("/:blogId/comment/:commentId", async (req, res, next) => {
 
 blogsRouter.post("/:blogId/comment", async (req, res, next) => {
   try {
-    const addedComment = await CommentModel.findById(req.body.commentId, {
-      _id: 0,
-    });
+    const addedComment = await CommentsModel.findById(req.body.commentId, {_id: 0 });
     if (addedComment) {
       const commentToInsert = {
         ...addedComment.toObject(),
@@ -124,8 +122,8 @@ blogsRouter.post("/:blogId/comment", async (req, res, next) => {
       };
       console.log(commentToInsert);
 
-      const modifiedBlog = await CommentModel.findByIdAndUpdate(
-        req.params.commentId,
+      const modifiedBlog = await BlogsModel.findByIdAndUpdate(
+        req.params.blogId,
         { $push: { comment: addedComment } },
         { new: true }
       );
@@ -136,6 +134,10 @@ blogsRouter.post("/:blogId/comment", async (req, res, next) => {
           createHttpError(404, `blog with Id ${req.params.blogId} not found!`)
         );
       }
+    } else {
+      next(
+        createHttpError(404, `comment with Id ${req.body.commentId} not found!`)
+      );
     }
   } catch (error) {
     next(error);
