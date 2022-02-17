@@ -85,11 +85,11 @@ blogsRouter.get("/:blogId/comment", async (req, res, next) => {
 });
 blogsRouter.get("/:blogId/comment/:commentId", async (req, res, next) => {
   try {
-    const blog = await BlogsModel.findById(req.params.id);
+    const blog = await BlogsModel.findById(req.params.blogId);
     if (!blog) {
       res
         .status(404)
-        .send({ message: `blog with ${req.params.id} is not found!` });
+        .send({ message: `blog with ${req.params.blogId} is not found!` });
     } else {
       const commentIndex = blog.comment.findIndex(
         (comment) => comment._id.toString() === req.params.commentId
@@ -99,7 +99,7 @@ blogsRouter.get("/:blogId/comment/:commentId", async (req, res, next) => {
           message: `comment with ${req.params.commentId} is not found!`,
         });
       } else {
-        blog.comments[commentIndex] = {
+        blog.comment[commentIndex] = {
           ...blog.comment[commentIndex]._doc,
           ...req.body,
         };
@@ -114,30 +114,18 @@ blogsRouter.get("/:blogId/comment/:commentId", async (req, res, next) => {
 
 blogsRouter.post("/:blogId/comment", async (req, res, next) => {
   try {
-    const addedComment = await CommentsModel.findById(req.body.commentId, {_id: 0 });
-    if (addedComment) {
-      const commentToInsert = {
-        ...addedComment.toObject(),
-        addedDate: new Date(),
-      };
-      console.log(commentToInsert);
-
-      const modifiedBlog = await BlogsModel.findByIdAndUpdate(
+    const blog = await BlogsModel.findById(req.params.blogId);
+    if (!blog) {
+      res
+        .status(404)
+        .send({ message: `blog with ${req.params.blogId} is not found!` });
+    } else {
+      const newBlog = await BlogsModel.findByIdAndUpdate(
         req.params.blogId,
-        { $push: { comment: addedComment } },
+        { $push: { comment: req.body } },
         { new: true }
       );
-      if (modifiedBlog) {
-        res.send(modifiedBlog);
-      } else {
-        next(
-          createHttpError(404, `blog with Id ${req.params.blogId} not found!`)
-        );
-      }
-    } else {
-      next(
-        createHttpError(404, `comment with Id ${req.body.commentId} not found!`)
-      );
+      res.send(newBlog);
     }
   } catch (error) {
     next(error);
@@ -146,11 +134,11 @@ blogsRouter.post("/:blogId/comment", async (req, res, next) => {
 
 blogsRouter.put("/:blogid/comment/:commentId", async (req, res, next) => {
   try {
-    const blog = await BlogsModel.findById(req.params.id);
+    const blog = await BlogsModel.findById(req.params.blogId);
     if (!blog) {
       res
         .status(404)
-        .send({ message: `blog with ${req.params.id} is not found!` });
+        .send({ message: `blog with ${req.params.blogId} is not found!` });
     } else {
       const commentIndex = blog.comment.findIndex(
         (comment) => comment._id.toString() === req.params.commentId
@@ -175,14 +163,14 @@ blogsRouter.put("/:blogid/comment/:commentId", async (req, res, next) => {
 });
 blogsRouter.delete("/:blogId/comment/:commentId", async (req, res, next) => {
   try {
-    const blog = await BlogsModel.findById(req.params.id);
+    const blog = await BlogsModel.findById(req.params.blogId);
     if (!blog) {
       res
         .status(404)
-        .send({ message: `blog with ${req.params.id} is not found!` });
+        .send({ message: `blog with ${req.params.blogId} is not found!` });
     } else {
       await BlogsModel.findByIdAndUpdate(
-        req.params.id,
+        req.params.blogId,
         {
           $pull: {
             comment: { _id: req.params.commentId },
