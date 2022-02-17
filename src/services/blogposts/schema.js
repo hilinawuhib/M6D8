@@ -7,7 +7,7 @@ const blogSchema = new Schema(
     cover: { type: String, required: true },
     readTime: {
       value: { type: Number, required: true },
-      unit: { type, required: true },
+      unit: { type:String, required: true },
     },
     author: {
       name: { type: String, required: true },

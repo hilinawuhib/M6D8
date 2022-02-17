@@ -118,7 +118,7 @@ blogsRouter.post("/:blogId/comment", async (req, res, next) => {
     if (addedComment) {
       const commentToInsert = {
         ...addedComment.toObject(),
-        Date: new Date(),
+        addedDate: new Date(),
       };
       console.log(commentToInsert);
 
@@ -142,7 +142,7 @@ blogsRouter.post("/:blogId/comment", async (req, res, next) => {
 
 blogsRouter.put("/:blogid/comment/:commentId", async (req, res, next) => {
   try {
-    const blog = await Blogs.findById(req.params.id);
+    const blog = await BlogsModel.findById(req.params.id);
     if (!blog) {
       res
         .status(404)
@@ -171,7 +171,7 @@ blogsRouter.put("/:blogid/comment/:commentId", async (req, res, next) => {
 });
 blogsRouter.delete("/:blogId/comment/:commentId", async (req, res, next) => {
   try {
-    const blog = await Blogs.findById(req.params.id);
+    const blog = await BlogsModel.findById(req.params.id);
     if (!blog) {
       res
         .status(404)
