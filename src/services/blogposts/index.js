@@ -221,12 +221,12 @@ blogsRouter.get("/:blogId", async (req, res, next) => {
 });
 blogsRouter.post("/", async (req, res, next) => {
   try {
-    const newBlog = new BlogsModel(req.body)
-    const { _id } = await newBlog.save()
-    res.status(201).send({ _id })
+    const newBlog = new BlogsModel(req.body);
+    const { _id } = await newBlog.save();
+    res.status(201).send({ _id });
   } catch (error) {
-    next(error)
+    next(error);
   }
-})
+});
 
 export default blogsRouter;
